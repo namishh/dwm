@@ -2,24 +2,22 @@
 
 /* appearance */
 #include <X11/XF86keysym.h>
-static const unsigned int borderpx  = 0;        /* border pixel of windows */
+static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const int user_bh            = 27;        /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const unsigned int snap      = 1;       /* snap pixel */
-static const unsigned int gappih    = 5;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 5;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 5;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 5;       /* vert outer gap between windows and screen edge */
+static const unsigned int gappih    = 9;       /* horiz inner gap between windows */
+static const unsigned int gappiv    = 9;       /* vert inner gap between windows */
+static const unsigned int gappoh    = 9;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov    = 9;       /* vert outer gap between windows and screen edge */
 static const char buttonbar[]       = " ";
-static const int vertpad            = 5;       /* vertical padding of bar */
-static const int sidepad            = 5;  
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int horizpadbar        = 0;        /* horizontal padding for statusbar */
 static const int vertpadbar         = 10;        /* vertical padding for statusbar */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
-static const unsigned int systrayonleft = 0;   	/* 0: systray in the right corner, >0: systray on left of status text */
+static const unsigned int systrayonleft = 0;  /* 0: systray in the right corner, >0: systray on left of status text */
 static const unsigned int systrayspacing = 2;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const unsigned int systrayiconsize = 20; /* systray icon size in px */
@@ -27,8 +25,6 @@ static const int showsystray        = 1;     /* 0 means no systray */
 static const char *fonts[]          = { "Iosevka Nerd Font:size=12:style=Regular","Noto Color Emoji:pixelsize=12:antialias=true:autohint=true",
                                           "Material Design Icons Desktop:size=11"  };
 static const char dmenufont[]       = "Iosevka Nerd Font:size=12";
-static const unsigned int colorfultitle  = 1;  /* 0 means title use SchemeTitle and SchemeTitleFloat */
-static const unsigned int colorfultag    = 1;  /* 0 means use SchemeSel for selected tag */
 static const char col_gray1[]       = "#0f0f0f";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -70,19 +66,19 @@ static Sp scratchpads[] = {
 /* tagging */
 static char *tags[] = {"cmd", "www", "dev", "chat", "sys", "med"};
 static char *alttags[] = {"[cmd]", "[www]", "[dev]",  "[chat]","[sys]", "[med]"};
-static const unsigned int ulinepad	= 1;	/* horizontal padding between the underline and tag */
+static const unsigned int ulinepad	= 2;	/* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke	= 2;	/* thickness / height of the underline */
 static const unsigned int ulinevoffset	= 0;	/* how far above the bottom of the bar the line should appear */
 static const int ulineall 		= 0;	/* 1 to show underline on all tags, 0 for just the active ones */
 
 
 static const char *tagsel[][2] = {
-	{ "#74be88", "#28292f" },
-	{ "#da696d", "#28292f" },
-	{ "#e1b56a", "#28292f" },
-	{ "#6d92b7", "#28292f" },
-	{ "#be67d5", "#28292f" },
-	{ "#679ca6", "#28292f" },
+	{ "#74be88", "#212126" },
+	{ "#da696d", "#212126" },
+	{ "#e1b56a", "#212126" },
+	{ "#6d92b7", "#212126" },
+	{ "#be67d5", "#212126" },
+	{ "#679ca6", "#212126" },
 };
 static const Rule rules[] = {
 	/* xprop(1):
