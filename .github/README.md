@@ -46,6 +46,7 @@ cd ~/.config/chadwm/bedwm
 + RainbowTags
 + ScratchPads
 + Status2d
++ StatusButton
 + StatusPadding
 + Swallow
 + Systray-Iconsize
