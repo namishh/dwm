@@ -32,7 +32,7 @@ Use this script to run the barinfo script!
 ## Making Changes And Compiling It Again
 
 ```bash
-cd ~/.config/chadwm/bedwm
+cd ~/.config/bedwm
 ./compiledwm
 ```
 ## Patches
