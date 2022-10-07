@@ -39,6 +39,7 @@ cd ~/.config/bedwm
 + ActualFullscreen
 + AltTagsDecoration
 + AutoStart
++ BarPadding
 + BarHeight
 + Cfacts
 + CycleLayouts
