@@ -21,27 +21,27 @@ updates() {
 
 battery() {
   BAT_ICON=$(~/.local/bin/battery --icon)
-  get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)%"
-  echo "^c$green^ $BAT_ICON $get_capacity"
+  get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)%%"
+  printf "\x04^c$green^ $BAT_ICON $get_capacity"
 }
 
 volume() {
   VOL_ICON="$(~/.local/bin/volume)"
   VOLUME=$(pamixer --get-volume)
-  echo "^c$blue^ $VOL_ICON $VOLUME%"
+  printf "\x03^c$blue^ $VOL_ICON $VOLUME%%"
 }
 
 wlan() {
   SSID=$(iwgetid -r)
 	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-	up) printf "^c$black^^b$blue^ 󰤨 ^d^%s""^c$blue^^b$black^ $SSID ^b$black^" ;;
-	down) printf "^c$black^^b$blue^ 󰤯 ^d^%s""^c$blue^^b$black^ Disconnected ^b$black^" ;;
+	up) printf "\x02^c$black^^b$blue^ 󰤨 ^d^%s""^c$blue^^b$grey^ $SSID ^b$black^" ;;
+	down) printf "\x02^c$black^^b$blue^ 󰤯 ^d^%s""^c$blue^^b$grey^ Disconnected ^b$black^" ;;
 	esac
 }
 
 clock() {
-	printf "^c$black^^b$darkblue^ 󰃭 "
-  printf "^c$black^^b$blue^ $(date '+%H:%M')"
+	printf "\x01^c$black^^b$darkblue^ 󰃭 "
+  printf "^c$black^^b$blue^ $(date '+%H:%M') ^b$black^"
 }
 
 brightness() {
@@ -52,7 +52,7 @@ brightness() {
 
 mem() {
   MEM=$(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)
-  echo "^b$grey^^c$red^ 󰘚 ^b$black^^c$red^ $MEM ^b$black^"
+  echo "^b$red^^c$black^ 󰘚 ^b$grey^^c$red^ $MEM ^b$black^"
 }
 
 cpu() {
@@ -60,9 +60,12 @@ cpu() {
 	echo "^c$grey^^b$green^ CPU ^c$green^^b$grey^ ${CPU} ^b$black^"
 }
 
+powermenu(){
+	printf "\x05^c$black^^b$red^ 󰤆 "
+}
+
 while true; do
   interval=$((interval + 1))
-  sleep 1 && xsetroot -name "$(volume)  $(battery)  $(cpu) $(mem)$(wlan)$(clock) "
+  sleep 1 && xsetroot -name "$(volume)  $(battery)  $(wlan) $(clock) $(powermenu)"
 done
-
 

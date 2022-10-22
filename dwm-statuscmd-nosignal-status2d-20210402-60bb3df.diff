@@ -1,0 +1,171 @@
+From df16de3b4457fd6537e6efaa1785183770056ed6 Mon Sep 17 00:00:00 2001
+From: Daniel Bylinka <daniel.bylinka@gmail.com>
+Date: Fri, 2 Apr 2021 19:33:35 +0200
+Subject: [PATCH] [statuscmd] status2d compatibility for statuscmd-nosignal
+
+---
+ config.def.h | 10 +++++++-
+ dwm.c        | 68 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 72 insertions(+), 6 deletions(-)
+
+diff --git a/config.def.h b/config.def.h
+index 1c0b587..8f88366 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -59,6 +59,12 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn()
+ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+ static const char *termcmd[]  = { "st", NULL };
+ 
++/* commands spawned when clicking statusbar, the mouse button pressed is exported as BUTTON */
++static const StatusCmd statuscmds[] = {
++	{ "notify-send Mouse$BUTTON", 1 },
++};
++static const char *statuscmd[] = { "/bin/sh", "-c", NULL, NULL };
++
+ static Key keys[] = {
+ 	/* modifier                     key        function        argument */
+ 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+@@ -103,7 +109,9 @@ static Button buttons[] = {
+ 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
+ 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
+ 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
+-	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
++	{ ClkStatusText,        0,              Button1,        spawn,          {.v = statuscmd } },
++	{ ClkStatusText,        0,              Button2,        spawn,          {.v = statuscmd } },
++	{ ClkStatusText,        0,              Button3,        spawn,          {.v = statuscmd } },
+ 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
+ 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
+ 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
+diff --git a/dwm.c b/dwm.c
+index acbe6c9..851b0ed 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -141,6 +141,11 @@ typedef struct {
+ 	int monitor;
+ } Rule;
+ 
++typedef struct {
++	const char *cmd;
++	int id;
++} StatusCmd;
++
+ /* function declarations */
+ static void applyrules(Client *c);
+ static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
+@@ -239,6 +244,9 @@ static void zoom(const Arg *arg);
+ /* variables */
+ static const char broken[] = "broken";
+ static char stext[1024];
++static int statusw;
++static int statuscmdn;
++static char lastbutton[] = "-";
+ static int screen;
+ static int sw, sh;           /* X display screen geometry width, height */
+ static int bh, blw = 0;      /* bar geometry */
+@@ -441,8 +449,27 @@ buttonpress(XEvent *e)
+ 			arg.ui = 1 << i;
+ 		} else if (ev->x < x + blw)
+ 			click = ClkLtSymbol;
+-		else if (ev->x > selmon->ww - (int)TEXTW(stext))
++		else if (ev->x > selmon->ww - statusw) {
++			char *text, *s, ch;
++			*lastbutton = '0' + ev->button;
++
++			x = selmon->ww - statusw;
+ 			click = ClkStatusText;
++
++			statuscmdn = 0;
++			for (text = s = stext; *s && x <= ev->x; s++) {
++				if ((unsigned char)(*s) < ' ') {
++					ch = *s;
++					*s = '\0';
++					x += TEXTW(text) - lrpad;
++					*s = ch;
++					text = s + 1;
++					if (x >= ev->x)
++						break;
++					statuscmdn = ch;
++				}
++			}
++		}
+ 		else
+ 			click = ClkWinTitle;
+ 	} else if ((c = wintoclient(ev->window))) {
+@@ -696,7 +723,7 @@ dirtomon(int dir)
+ 
+ int
+ drawstatusbar(Monitor *m, int bh, char* stext) {
+-	int ret, i, w, x, len;
++	int ret, i, j, w, x, len;
+ 	short isCode = 0;
+ 	char *text;
+ 	char *p;
+@@ -705,7 +732,12 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
+ 	if (!(text = (char*) malloc(sizeof(char)*len)))
+ 		die("malloc");
+ 	p = text;
+-	memcpy(text, stext, len);
++
++	i = -1, j = 0;
++	while (stext[++i])
++		if ((unsigned char)stext[i] >= ' ')
++			text[j++] = stext[i];
++	text[j] = '\0';
+ 
+ 	/* compute width of the status text */
+ 	w = 0;
+@@ -813,7 +845,7 @@ drawbar(Monitor *m)
+ 
+ 	/* draw status first so it can be overdrawn by tags later */
+ 	if (m == selmon) { /* status is only drawn on selected monitor */
+-		tw = m->ww - drawstatusbar(m, bh, stext);
++		tw = statusw = m->ww - drawstatusbar(m, bh, stext);
+ 	}
+ 
+ 	for (c = m->clients; c; c = c->next) {
+@@ -1753,6 +1785,17 @@ spawn(const Arg *arg)
+ 	if (fork() == 0) {
+ 		if (dpy)
+ 			close(ConnectionNumber(dpy));
++		if (arg->v == statuscmd) {
++			for (int i = 0; i < LENGTH(statuscmds); i++) {
++				if (statuscmdn == statuscmds[i].id) {
++					statuscmd[2] = statuscmds[i].cmd;
++					setenv("BUTTON", lastbutton, 1);
++					break;
++				}
++			}
++			if (!statuscmd[2])
++				exit(EXIT_SUCCESS);
++		}
+ 		setsid();
+ 		execvp(((char **)arg->v)[0], (char **)arg->v);
+ 		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
+@@ -2098,8 +2141,23 @@ updatesizehints(Client *c)
+ void
+ updatestatus(void)
+ {
+-	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
++	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext))) {
+ 		strcpy(stext, "dwm-"VERSION);
++		statusw = TEXTW(stext) - lrpad + 2;
++	} else {
++		char *text, *s, ch;
++		statusw = 0;
++		for (text = s = stext; *s; s++) {
++			if ((unsigned char)(*s) < ' ') {
++				ch = *s;
++				*s = '\0';
++				statusw += TEXTW(text) - lrpad;
++				*s = ch;
++				text = s + 1;
++			}
++		}
++		statusw += TEXTW(text) - lrpad + 2;
++	}
+ 	drawbar(selmon);
+ }
+ 
+-- 
+2.31.0
+

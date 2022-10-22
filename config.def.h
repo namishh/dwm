@@ -8,21 +8,21 @@ static const int user_bh = 27; /* 0 means that dwm will calculate bar height, >=
 static const int swallowfloating =
     0; /* 1 means swallow floating windows by default */
 static const unsigned int snap = 1;   /* snap pixel */
-static const unsigned int gappih = 9; /* horiz inner gap between windows */
-static const unsigned int gappiv = 9; /* vert inner gap between windows */
+static const unsigned int gappih = 6; /* horiz inner gap between windows */
+static const unsigned int gappiv = 6; /* vert inner gap between windows */
 static const unsigned int gappoh =
-    9; /* horiz outer gap between windows and screen edge */
+    6; /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov =
-    9; /* vert outer gap between windows and screen edge */
+    6; /* vert outer gap between windows and screen edge */
 static const char buttonbar[] = " ";
 static int smartgaps =
     0; /* 1 means no outer gap when there is only one window */
 static const int showbar = 1;     /* 0 means no bar */
 static const int topbar = 1;      /* 0 means bottom bar */
-static const int horizpadbar = 6; /* horizontal padding for statusbar */
+static const int horizpadbar = 0; /* horizontal padding for statusbar */
 static const int vertpadbar = 10; /* vertical padding for statusbar */
-static const int vertpad = 9;     /* vertical padding of bar */
-static const int sidepad = 9;     /* horizontal padding of bar */
+static const int vertpad = 0;     /* vertical padding of bar */
+static const int sidepad = 0;     /* horizontal padding of bar */
 static const unsigned int systraypinning =
     0; /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor
           X */
@@ -44,6 +44,7 @@ static const char col_gray2[] = "#444444";
 static const char col_gray3[] = "#bbbbbb";
 static const char col_gray4[] = "#dfdde0";
 static const char col_cyan[] = "#6d92b7";
+static const char col_orange[] = "#e19a5a";
 
 static const char *colors[][3] = {
     /*               fg         bg         border   */
@@ -63,6 +64,15 @@ static Sp scratchpads[] = {
     {"spterm", spcmd1},
     {"spranger", spcmd2},
 };
+
+static const StatusCmd statuscmds[] = {
+    {"eww open --toggle calbox", 1},    {"wifimenu", 2},
+    {"eww open --toggle symphony", 3},  {"eww open --toggle census", 4},
+    {"eww open --toggle powermenu", 5},
+};
+
+static const char *statuscmd[] = {"/bin/sh", "-c", NULL, NULL};
+
 /* tagging */
 static char *tags[] = {"cmd", "www", "dev", "chat", "sys", "med"};
 static char *alttags[] = {"[cmd]",  "[www]", "[dev]",
@@ -133,7 +143,7 @@ static const Layout layouts[] = {
 /* commands */
 static const char *dmenucmd[] = {"dmenu_run", "-l", "15",        "-c", "-h",
                                  "34",        "-p", " Launch:", NULL};
-
+static const char *ewwmenu[] = {"eww", "open", "--toggle", "sidebar", NULL};
 static const Key keys[] = {
     /* modifier                     key        function        argument */
     {MODKEY, XK_b, togglebar, {0}},
@@ -191,9 +201,12 @@ static const Key keys[] = {
  * ClkClientWin, or ClkRootWin */
 static const Button buttons[] = {
     /* click                event mask      button          function argument */
-    {ClkButton, 0, Button1, spawn, {.v = dmenucmd}},
+    {ClkButton, 0, Button1, spawn, {.v = ewwmenu}},
     {ClkLtSymbol, 0, Button1, setlayout, {0}},
     {ClkLtSymbol, 0, Button3, setlayout, {.v = &layouts[2]}},
+    {ClkStatusText, 0, Button1, spawn, {.v = statuscmd}},
+    {ClkStatusText, 0, Button2, spawn, {.v = statuscmd}},
+    {ClkStatusText, 0, Button3, spawn, {.v = statuscmd}},
     {ClkClientWin, MODKEY, Button1, movemouse, {0}},
     {ClkClientWin, MODKEY, Button2, togglefloating, {0}},
     {ClkClientWin, MODKEY, Button3, resizemouse, {0}},
