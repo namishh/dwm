@@ -49,6 +49,7 @@ cd ~/.config/bedwm
 + Status2d
 + StatusButton
 + StatusPadding
++ StatusCmd
 + Swallow
 + Systray-Iconsize
 + UnderlineTags
