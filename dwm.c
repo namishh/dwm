@@ -574,7 +574,7 @@ void buttonpress(XEvent *e) {
   Client *c;
   Monitor *m;
   XButtonPressedEvent *ev = &e->xbutton;
-
+  int stw = 0;
   click = ClkRootWin;
   /* focus monitor if necessary */
   if ((m = wintomon(ev->window)) && m != selmon) {
@@ -599,10 +599,10 @@ void buttonpress(XEvent *e) {
         arg.ui = 1 << i;
       } else if (ev->x < x + TEXTW(selmon->ltsymbol))
         click = ClkLtSymbol;
-      else if (ev->x > selmon->ww - statusw) {
+      else if (ev->x > selmon->ww - statusw - stw - 2 * sp) {
         char *text, *s, ch;
         *lastbutton = '0' + ev->button;
-        x = selmon->ww - statusw;
+        x = selmon->ww - statusw - stw - 2 * sp;
         click = ClkStatusText;
         statuscmdn = 0;
         for (text = s = stext; *s && x <= ev->x; s++) {

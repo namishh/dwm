@@ -14,7 +14,7 @@ static const unsigned int gappoh =
     6; /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov =
     6; /* vert outer gap between windows and screen edge */
-static const char buttonbar[] = " ";
+static const char buttonbar[] = " ";
 static int smartgaps =
     0; /* 1 means no outer gap when there is only one window */
 static const int showbar = 1;     /* 0 means no bar */
@@ -45,11 +45,12 @@ static const char col_gray3[] = "#bbbbbb";
 static const char col_gray4[] = "#dfdde0";
 static const char col_cyan[] = "#6d92b7";
 static const char col_orange[] = "#e19a5a";
+static const char col_green[] = "#74be88";
 
 static const char *colors[][3] = {
     /*               fg         bg         border   */
     [SchemeNorm] = {col_gray3, col_gray1, col_gray2},
-    [SchemeBtn] = {col_cyan, col_gray1, col_gray2},
+    [SchemeBtn] = {col_green, col_gray1, col_gray2},
     [SchemeSel] = {col_gray4, col_cyan, col_cyan},
 };
 
@@ -58,17 +59,15 @@ typedef struct {
   const void *cmd;
 } Sp;
 const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x28", NULL};
-const char *spcmd2[] = {"st", "-n", "spfm", "-g", "120x28", "-e", "lfub", NULL};
 static Sp scratchpads[] = {
     /* name          cmd  */
     {"spterm", spcmd1},
-    {"spranger", spcmd2},
 };
 
 static const StatusCmd statuscmds[] = {
-    {"eww open --toggle calbox", 1},    {"wifimenu", 2},
-    {"eww open --toggle symphony", 3},  {"eww open --toggle census", 4},
-    {"eww open --toggle powermenu", 5},
+    {"~/.local/bin/statusbar/power", 1},
+    {"~/.local/bin/statusbar/wifi", 2},
+    {"~/.local/bin/statusbar/calendar", 3},
 };
 
 static const char *statuscmd[] = {"/bin/sh", "-c", NULL, NULL};
@@ -87,8 +86,8 @@ static const int ulineall =
     0; /* 1 to show underline on all tags, 0 for just the active ones */
 
 static const char *tagsel[][2] = {
-    {"#74be88", "#212126"}, {"#da696d", "#212126"}, {"#e1b56a", "#212126"},
-    {"#6d92b7", "#212126"}, {"#be67d5", "#212126"}, {"#679ca6", "#212126"},
+    {"#6d92b7", "#212126"}, {"#da696d", "#212126"}, {"#e1b56a", "#212126"},
+    {"#74be88", "#212126"}, {"#be67d5", "#212126"}, {"#679ca6", "#212126"},
 };
 static const Rule rules[] = {
     /* xprop(1):
@@ -102,7 +101,6 @@ static const Rule rules[] = {
     {"st-256color", NULL, NULL, 0, 0, 1, 0, -1},
     {NULL, NULL, "Event Tester", 0, 0, 0, 1, -1}, /* xev */
     {NULL, "spterm", NULL, SPTAG(0), 1, 1, 0, -1},
-    {NULL, "spfm", NULL, SPTAG(1), 1, 1, 0, -1},
 };
 
 /* layout(s) */
@@ -141,9 +139,7 @@ static const Layout layouts[] = {
   }
 
 /* commands */
-static const char *dmenucmd[] = {"dmenu_run", "-l", "15",        "-c", "-h",
-                                 "34",        "-p", " Launch:", NULL};
-static const char *ewwmenu[] = {"eww", "open", "--toggle", "sidebar", NULL};
+static const char *appmenu[] = {"rofi", "-show", "drun", NULL};
 static const Key keys[] = {
     /* modifier                     key        function        argument */
     {MODKEY, XK_b, togglebar, {0}},
@@ -190,7 +186,6 @@ static const Key keys[] = {
     {MODKEY | ShiftMask, XK_comma, tagmon, {.i = -1}},
     {MODKEY | ShiftMask, XK_period, tagmon, {.i = +1}},
     {MODKEY | ShiftMask, XK_b, togglescratch, {.ui = 0}},
-    {MODKEY | ShiftMask, XK_v, togglescratch, {.ui = 1}},
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
         TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5)
             TAGKEYS(XK_7, 6){MODKEY | ShiftMask, XK_q, quit, {0}},
@@ -201,7 +196,7 @@ static const Key keys[] = {
  * ClkClientWin, or ClkRootWin */
 static const Button buttons[] = {
     /* click                event mask      button          function argument */
-    {ClkButton, 0, Button1, spawn, {.v = ewwmenu}},
+    {ClkButton, 0, Button1, spawn, {.v = appmenu}},
     {ClkLtSymbol, 0, Button1, setlayout, {0}},
     {ClkLtSymbol, 0, Button3, setlayout, {.v = &layouts[2]}},
     {ClkStatusText, 0, Button1, spawn, {.v = statuscmd}},
