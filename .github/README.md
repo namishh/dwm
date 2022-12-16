@@ -38,6 +38,7 @@ cd ~/.config/bedwm
 ## Patches
 + ActualFullscreen
 + AltTagsDecoration
++ Alwayscenter
 + AutoStart
 + BarPadding
 + BarHeight

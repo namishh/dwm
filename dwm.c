@@ -86,7 +86,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel, SchemeBtn };       /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeBtn, SchemeLt };       /* color schemes */
 enum {
   NetSupported,
   NetWMName,
@@ -602,7 +602,7 @@ void buttonpress(XEvent *e) {
       else if (ev->x > selmon->ww - statusw - stw - 2 * sp) {
         char *text, *s, ch;
         *lastbutton = '0' + ev->button;
-        x = selmon->ww - statusw - stw - 2 * sp;
+        x = selmon->ww - statusw - stw - 2 * sp - getsystraywidth();
         click = ClkStatusText;
         statuscmdn = 0;
         for (text = s = stext; *s && x <= ev->x; s++) {
@@ -1075,8 +1075,6 @@ int drawstatusbar(Monitor *m, int bh, char *stext) {
 
 void drawbar(Monitor *m) {
   int x, w, tw = 0, stw = 0;
-  int boxs = drw->fonts->h / 9;
-  int boxw = drw->fonts->h / 6 + 2;
   unsigned int i, occ = 0, urg = 0;
   const char *tagtext;
   Client *c;
@@ -1123,8 +1121,8 @@ void drawbar(Monitor *m) {
     x += w;
   }
   w = TEXTW(m->ltsymbol);
-  drw_setscheme(drw, scheme[SchemeNorm]);
-  x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+  drw_setscheme(drw, scheme[SchemeLt]);
+  x = drw_text(drw, x, 0, w, bh , lrpad / 2, m->ltsymbol, 0);
 
   if ((w = m->ww - tw - stw - x) > bh) {
     drw_setscheme(drw, scheme[SchemeNorm]);
@@ -1428,8 +1426,8 @@ void manage(Window w, XWindowAttributes *wa) {
     c->x = c->mon->wx + c->mon->ww - WIDTH(c);
   if (c->y + HEIGHT(c) > c->mon->wy + c->mon->wh)
     c->y = c->mon->wy + c->mon->wh - HEIGHT(c);
-  c->x = MAX(c->x, c->mon->wx);
-  c->y = MAX(c->y, c->mon->wy);
+  c->x = MAX(c->x, c->mon->wx + (c->mon->mw - WIDTH(c)) / 2);
+  c->y = MAX(c->y, c->mon->wy + (c->mon->mh - HEIGHT(c)) / 2);
   c->bw = borderpx;
 
   wc.border_width = c->bw;

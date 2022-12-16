@@ -1,7 +1,0 @@
-#!/bin/sh
-
-case $BUTTON in
-	1) ~/.local/bin/powermenu ;;
-	3) ~/.local/bin/lock ;;
-esac
-
