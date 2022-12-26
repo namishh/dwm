@@ -14,7 +14,7 @@ static const unsigned int gappoh =
     6; /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov =
     6; /* vert outer gap between windows and screen edge */
-static const char buttonbar[] = " ";
+static const char buttonbar[] = " ";
 static int smartgaps =
     0; /* 1 means no outer gap when there is only one window */
 static const int showbar = 1;     /* 0 means no bar */
@@ -36,7 +36,7 @@ static const unsigned int systrayiconsize = 20; /* systray icon size in px */
 static const int showsystray = 1;               /* 0 means no systray */
 static const char *fonts[] = {
     "Iosevka Nerd Font:size=12:style=Regular",
-    "Noto Color Emoji:pixelsize=12:antialias=true:autohint=true",
+    "Noto Color Emoji:size=12:antialias=true:autohint=true",
     "Material Design Icons Desktop:size=11"};
 static const char dmenufont[] = "Iosevka Nerd Font:size=12";
 static const char col_back[] = "#121111";
@@ -55,13 +55,13 @@ static const char col_magenta[] = "#b183ba";
 static const char *colors[][3] = {
     /*               fg         bg         border   */
     [SchemeNorm] = {col_gray3, col_back, col_gray2},
-    [SchemeBtn] = {col_green, col_gray1, col_gray2},
+    [SchemeBtn] = {col_blue, col_gray1, col_gray2},
     [SchemeLt] = {col_gray4, col_back, col_gray2},
     [SchemeSel] = {col_gray4, col_blue, col_blue},
 };
 static const char *tagsel[][2] = {
-    {col_blue, col_back}, {col_red, col_back}, {col_yellow, col_back},
-    {col_green, col_back}, {col_magenta, col_back}, {col_cyan, col_back},
+    {col_green, col_back}, {col_red, col_back}, {col_yellow, col_back},
+    {col_blue, col_back}, {col_magenta, col_back}, {col_cyan, col_back},
 };
 
 typedef struct {
@@ -69,9 +69,11 @@ typedef struct {
   const void *cmd;
 } Sp;
 const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x28", NULL};
+const char *spcmd2[] = {"st", "-n", "spmpd", "-e", "ncmpcpp", NULL};
 static Sp scratchpads[] = {
     /* name          cmd  */
     {"spterm", spcmd1},
+    {"spmpd", spcmd2},
 };
 
 static const StatusCmd statuscmds[] = {
@@ -82,6 +84,7 @@ static const StatusCmd statuscmds[] = {
     {"~/.local/bin/statusbar/sound", 5},
     {"~/.local/bin/statusbar/mindash", 6},
     {"~/.local/bin/statusbar/mincalendar", 7},
+    {"~/.local/bin/statusbar/notifications", 8},
 };
 
 static const char *statuscmd[] = {"/bin/bash", "-c", NULL, NULL};
@@ -111,6 +114,7 @@ static const Rule rules[] = {
     {"st-256color", NULL, NULL, 0, 0, 1, 0, -1},
     {NULL, NULL, "Event Tester", 0, 0, 0, 1, -1}, /* xev */
     {NULL, "spterm", NULL, SPTAG(0), 1, 1, 0, -1},
+    {NULL, "spmpd", NULL, SPTAG(1), 1, 1, 0, -1},
 };
 
 /* layout(s) */
@@ -196,6 +200,7 @@ static const Key keys[] = {
     {MODKEY | ShiftMask, XK_comma, tagmon, {.i = -1}},
     {MODKEY | ShiftMask, XK_period, tagmon, {.i = +1}},
     {MODKEY | ShiftMask, XK_b, togglescratch, {.ui = 0}},
+    {MODKEY | ShiftMask, XK_v, togglescratch, {.ui = 1}},
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
         TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5)
             TAGKEYS(XK_7, 6){MODKEY | ShiftMask, XK_q, quit, {0}},
